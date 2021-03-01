@@ -89,19 +89,30 @@ apple_v2 %>%
   ggplot(aes(x = week, y = mean_mob, color = transportation_type)) + geom_point() +
   facet_grid(~region)
 
+
 # Google:
 google_v2 %>% 
   filter(year(date) == 2020, week <= 33,
          nation %in% c("england", "wales")) %>% 
+  mutate(mobility_fix = case_when(type == "residential" ~ mobility * (-1),
+                              TRUE ~ mobility)) %>% 
   group_by(nation, week, type) %>% 
-  summarise(mean_mob = mean(mobility, na.rm = T)) %>% 
-  ggplot(aes(x = date, y = mobility, color = type)) + geom_point() +
+  summarise(mean_mob = mean(mobility_fix, na.rm = T)) %>% 
+  ggplot(aes(x = week, y = mean_mob, color = type)) + geom_point() +
   facet_grid(~nation)
 
 # Have to create a sumup column for each type to have aggregate data
 
 
 # Facebook:
-
+facebook_v2 %>% 
+  filter(year(date) == 2020, week <= 33,
+         polygon_name %in% c("England", "Wales")) %>%
+  group_by(polygon_name, week) %>% 
+  summarise(mean_mob = mean(all_day_ratio_single_tile_users, na.rm = T)) %>% 
+  ggplot(aes(x = week, y = mean_mob)) + geom_point() +
+  facet_grid(~polygon_name)
+  
+  
   
 
