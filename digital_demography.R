@@ -50,9 +50,12 @@ google %>%
   left_join(uk_nations, by = "la") %>% 
   select(country_region, la, nation, date,
          retail, grocery, parks, transit, workplaces, residential) %>% 
-  filter(!is.na(nation)) -> google_v2
+  filter(!is.na(nation)) %>% 
+  pivot_longer(cols = c("retail", "grocery", "parks", "transit", "workplaces", "residential"), 
+               names_to = "type", 
+               values_to = "mobility") -> google_v2
   
   
-
+glimpse(google_v2)
 
 
