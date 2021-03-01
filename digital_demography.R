@@ -1,6 +1,7 @@
 # Loading libraries
 library(tidyverse)
 library(lubridate)
+library(data.table)
 
 
 # Loading Regions from UK to do inner join of data:
@@ -59,3 +60,18 @@ google %>%
 glimpse(google_v2)
 
 
+
+# Loading data from Facebook:
+facebook <- fread("movement-range-2021-02-27.txt")
+
+glimpse(facebook)
+
+
+facebook %>% 
+  filter(polygon_name %in% c("England", "Wales")) %>% 
+  mutate(date = ymd(ds)) %>% 
+  select(date, polygon_name, 
+         all_day_bing_tiles_visited_relative_change,
+         all_day_ratio_single_tile_users) ->  facebook_v2
+
+glimpse(facebook_v2)
