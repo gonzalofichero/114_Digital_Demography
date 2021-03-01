@@ -54,7 +54,8 @@ google %>%
   filter(!is.na(nation)) %>% 
   pivot_longer(cols = c("retail", "grocery", "parks", "transit", "workplaces", "residential"), 
                names_to = "type", 
-               values_to = "mobility") -> google_v2
+               values_to = "mobility") %>% 
+  mutate(week = epiweek(date)) -> google_v2
   
   
 glimpse(google_v2)
@@ -75,3 +76,20 @@ facebook %>%
          all_day_ratio_single_tile_users) ->  facebook_v2
 
 glimpse(facebook_v2)
+
+
+# Let's plot to see what we have in each data.frame
+
+# Apple:
+apple_v2 %>% 
+  filter(year(day) == 2020, week <= 33) %>% 
+  group_by(region, week, transportation_type) %>% 
+  summarise(mean_mob = mean(mobility, na.rm = T)) %>% 
+  ggplot(aes(x = week, y = mean_mob, color = transportation_type)) + geom_point() +
+  facet_grid(~region)
+
+# Google:
+google_v2 %>% 
+  filter(year(day) == 2020, week <= 33) %>% 
+  
+
