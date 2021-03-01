@@ -38,7 +38,7 @@ glimpse(google)
 
 google %>% 
   filter(country_region == "United Kingdom") %>%
-  rename(region = sub_region_1,
+  rename(la = sub_region_1,
          retail = retail_and_recreation_percent_change_from_baseline,
          grocery = grocery_and_pharmacy_percent_change_from_baseline,
          parks = parks_percent_change_from_baseline,
@@ -46,16 +46,13 @@ google %>%
          workplaces = workplaces_percent_change_from_baseline,
          residential = residential_percent_change_from_baseline
          ) %>%
-  mutate(region = tolower(region)) %>% 
-  left_join(uk_geo, by = "region") %>% 
-  select(country_region, region, la, nation, date,
+  mutate(la = tolower(la)) %>% 
+  left_join(uk_nations, by = "la") %>% 
+  select(country_region, la, nation, date,
          retail, grocery, parks, transit, workplaces, residential) %>% 
   filter(!is.na(nation)) -> google_v2
   
   
-
-
-
 
 
 
