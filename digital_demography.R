@@ -73,7 +73,8 @@ facebook %>%
   mutate(date = ymd(ds)) %>% 
   select(date, polygon_name, 
          all_day_bing_tiles_visited_relative_change,
-         all_day_ratio_single_tile_users) ->  facebook_v2
+         all_day_ratio_single_tile_users) %>% 
+  mutate(week = epiweek(date)) ->  facebook_v2
 
 glimpse(facebook_v2)
 
@@ -90,6 +91,17 @@ apple_v2 %>%
 
 # Google:
 google_v2 %>% 
-  filter(year(day) == 2020, week <= 33) %>% 
+  filter(year(date) == 2020, week <= 33,
+         nation %in% c("england", "wales")) %>% 
+  group_by(nation, week, type) %>% 
+  summarise(mean_mob = mean(mobility, na.rm = T)) %>% 
+  ggplot(aes(x = date, y = mobility, color = type)) + geom_point() +
+  facet_grid(~nation)
+
+# Have to create a sumup column for each type to have aggregate data
+
+
+# Facebook:
+
   
 
