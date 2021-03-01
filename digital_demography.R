@@ -109,7 +109,7 @@ facebook_v2 %>%
   filter(year(date) == 2020, week <= 33,
          polygon_name %in% c("England", "Wales")) %>%
   group_by(polygon_name, week) %>% 
-  summarise(mean_mob = mean(all_day_ratio_single_tile_users, na.rm = T)) %>% 
+  summarise(mean_mob = mean(all_day_bing_tiles_visited_relative_change, na.rm = T)) %>% 
   ggplot(aes(x = week, y = mean_mob)) + geom_point() +
   facet_grid(~polygon_name)
   
