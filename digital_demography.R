@@ -162,13 +162,6 @@ ggplot(data = google_v3, aes(x = week, y = mean_mobility, color = interaction(so
   theme_bw()
 
 
-g <- ggplot(data = google_v3, aes(x = week, y = mean_mobility, color = type)) + geom_line() + facet_wrap(~ toupper(nation))
-a <- ggplot(data = apple_v3, aes(x = week, y = mean_mobility, color = type)) + geom_point() + facet_wrap(~ toupper(nation))
-f <- ggplot(data = facebook_v3, aes(x = week, y = mean_mobility), color="black") + geom_line() + facet_wrap(~ toupper(nation))
-
-
-plot_grid(g, a, f, ncol = 1)
-
 
 #### Exercise 2: Missing values in Google ####
 
