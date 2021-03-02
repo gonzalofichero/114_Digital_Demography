@@ -10,6 +10,13 @@ uk_nations <- read_csv("uk_nations.csv")
 
 uk_regions <- read_csv("uk_regions.csv")
 
+##### There are duplicates for table in 17 la's ##### 
+uk_regions %>% 
+  group_by(region, la) %>% 
+  summarise(duplicate = n()) %>% 
+  select(-duplicate) -> uk_regions_v2
+
+
 uk_geo <- uk_regions %>% left_join(uk_nations, by = "la")
 
 
@@ -184,7 +191,7 @@ google %>%
   ) %>%
   mutate(la = tolower(la)) %>%
   ### Using uk_regions for joining this time, since we don't care for Nations variable
-  left_join(uk_regions, by = "la") %>% 
+  left_join(uk_regions_v2, by = "la") %>% 
   ###
   select(country_region, la, region, date,
          retail, grocery, parks, transit, workplaces, residential) %>% 
