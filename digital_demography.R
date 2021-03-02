@@ -2,6 +2,7 @@
 library(tidyverse)
 library(lubridate)
 library(data.table)
+library(cowplot)
 
 
 #### Loading Regions from UK to do inner join of data: ####
@@ -112,14 +113,69 @@ facebook_v2 %>%
   summarise(mean_mob = mean(all_day_bing_tiles_visited_relative_change, na.rm = T)) %>% 
   ggplot(aes(x = week, y = mean_mob)) + geom_point() +
   facet_grid(~polygon_name)
-  
-  
+
+
+
+##### Putting everything together (same structure) #####
+
+###### Google (base) ######
+google_v3 <- google_v2 %>% 
+                  filter(year(date) == 2020, week <= 33,
+                          nation %in% c("england", "wales")) %>% 
+                  select(nation, week, type, mobility) %>% 
+                  mutate(source = "Google") %>% 
+                  group_by(source, nation, type, week) %>% 
+                  summarise(mean_mobility = mean(mobility, na.rm = TRUE))
+              
+
+###### Apple ######
+apple_v3 <- apple_v2 %>%
+              filter(year(day) == 2020, week <= 33) %>% 
+              select(region, week, transportation_type, mobility) %>% 
+              rename(nation = region,
+                     type = transportation_type) %>% 
+              mutate(source = "Apple") %>% 
+              group_by(source, nation, type, week) %>% 
+              summarise(mean_mobility = mean(mobility, na.rm = TRUE)) %>% 
+              mutate(mean_mobility = mean_mobility - 100)
+
+###### Facebook ######
+facebook_v3 <- facebook_v2 %>% 
+                filter(year(date) == 2020, week <= 33,
+                        polygon_name %in% c("England", "Wales")) %>%
+                select(polygon_name, week, all_day_bing_tiles_visited_relative_change) %>% 
+                rename(nation = polygon_name,
+                       mobility = all_day_bing_tiles_visited_relative_change) %>% 
+                mutate(source = "Facebook") %>% 
+                group_by(source, nation, week) %>% 
+                summarise(mean_mobility = mean(mobility, na.rm = TRUE)) %>% 
+                mutate(mean_mobility = mean_mobility * 100,
+                       type = "mobility")
+
+
+###### All together now! ######
+
+ggplot(data = google_v3, aes(x = week, y = mean_mobility, color = interaction(source, type))) + geom_line() +
+  geom_point(data = apple_v3, aes(x = week, y = mean_mobility, color = interaction(source, type))) +
+  geom_line(data = facebook_v3, aes(x = week, y = mean_mobility, color=interaction(source, type)), size = 1) +
+  facet_wrap(~ toupper(nation)) +
+  theme_bw()
+
+
+g <- ggplot(data = google_v3, aes(x = week, y = mean_mobility, color = type)) + geom_line() + facet_wrap(~ toupper(nation))
+a <- ggplot(data = apple_v3, aes(x = week, y = mean_mobility, color = type)) + geom_point() + facet_wrap(~ toupper(nation))
+f <- ggplot(data = facebook_v3, aes(x = week, y = mean_mobility), color="black") + geom_line() + facet_wrap(~ toupper(nation))
+
+
+plot_grid(g, a, f, ncol = 1)
 
 
 #### Exercise 2: Missing values in Google ####
 
 # Only Google data
 # All data, also the missing stuff
+
+##### Pipe Transformation #####
 google %>% 
   filter(country_region == "United Kingdom") %>%
   rename(la = sub_region_1,
@@ -149,7 +205,7 @@ google %>%
   summarise(share_miss = sum(miss_flag),
             obs = n()) -> google_miss
 
-
+##### Plotting missing data by region and week #####
 google_miss %>% 
   filter(region %in% c("east of england", "east midlands", "london",
                        "north east england", "north west england", "south east england",
