@@ -155,11 +155,14 @@ facebook_v3 <- facebook_v2 %>%
 
 ###### All together now! ######
 
-ggplot(data = google_v3, aes(x = week, y = mean_mobility, color = interaction(source, type))) + geom_line() +
+ggplot(data = google_v3, aes(x = week, y = mean_mobility, color = interaction(source, type))) + geom_line(linetype = "dotdash", size = 1) +
   geom_point(data = apple_v3, aes(x = week, y = mean_mobility, color = interaction(source, type))) +
   geom_line(data = facebook_v3, aes(x = week, y = mean_mobility, color=interaction(source, type)), size = 1) +
   facet_wrap(~ toupper(nation)) +
+  labs(color = "Source : Category") +
+  #theme(legend.title = element_text()) +
   theme_bw()
+  
 
 
 
